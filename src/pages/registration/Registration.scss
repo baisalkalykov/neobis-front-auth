@@ -1,0 +1,83 @@
+.register{
+  
+&__container{
+    width: 1200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 100px;
+}    
+&__arow{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+&__arow-p{
+    font-size: 16px;
+    cursor: pointer;
+    color: #292929;
+}
+&__link{
+    text-decoration: none;
+}
+&__images{
+    width: 720px;
+    height: 1024px;
+} 
+&__form{
+    width: 343px;
+    height: 554px;
+    display: flex;
+   flex-direction: column;
+} 
+&__form-p{
+    text-align: center;
+    color: black;
+    font-size: 32px;
+}
+&__form-input{
+    width: 343px;
+    height: 52px;
+    border-radius:12px;
+    border: none;
+    background:#F8F8F8;
+    outline: none;
+    padding-left: 13px;
+    margin-bottom: 20px;
+}  
+&__form-input::placeholder{
+    font-size: 16px;
+    color:#767676;
+}
+&__form-text{
+    margin-bottom: 20px;
+}
+&__form-li{
+    font-size: 12px;
+    color: #767676;
+}
+&__form-password{
+    position: relative;
+}
+&__form-img{
+    position: absolute;
+    top: 20%;
+    right: 0%;
+    cursor: pointer;
+}
+&__btn{
+    width: 343px;
+    height: 50px;
+    border: none;
+    border-radius: 12px;
+    background: #D7D7D7;
+    font-size: 16px;
+    color: #767676;
+    cursor: pointer;
+}
+&__btn:hover{
+    background: #292929;
+    color: #F8F8F8;
+}
+}

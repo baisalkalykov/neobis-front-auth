@@ -1,5 +1,6 @@
 import React from 'react'
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import './Login.scss'
 import boy from '../../assets-images/Photo background.png'
 import eye from '../../assets-images/eye.svg'
@@ -47,7 +48,10 @@ function Login() {
         onClick={handleEyeClic} />
       </label>
       <button className='login__form-btn'>Войти</button>
-
+      <Link to={'/registration'} className='login__form-link'>
+      <p className='login__form-text'>У меня еще нет аккаунта</p>
+      </Link>
+       
      </form>
     </div>
   )
