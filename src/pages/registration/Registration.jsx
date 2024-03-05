@@ -6,7 +6,7 @@ import eye from '../../assets-images/eye.svg'
 import eyeoff from '../../assets-images/eye-close.svg'
 import arow from '../../assets-images/arow.svg'
 import './Registration.scss'
-import { Formik } from 'formik'
+import { Formik, ErrorMessage } from 'formik'
 import * as yup from 'yup' 
 
 
@@ -16,21 +16,24 @@ function Registration() {
   const validationsSchema= yup.object().shape({
     email:yup.string().email('должно быть строкой').required('Обязательно'),
     login:yup.string().typeError('должно быть строкой').required('Обязательно'),
-    password:yup.string().typeError('должно быть строкой').required('Обязательно'),
+    password: yup.string()
+    .min(8, 'Пароль должен содержать минимум 8 символов')
+    .max(15, 'Пароль должен содержать максимум 15 символов')
+    .matches(/[a-z]/, 'Пароль должен содержать строчные буквы')
+    .matches(/[A-Z]/, 'Пароль должен содержать прописные буквы')
+    .matches(/\d/, 'Пароль должен содержать минимум 1 цифру')
+    .matches(/[!@#$%^&*(),.?":{}|<>]/, 'Пароль должен содержать минимум 1 спецсимвол'),
     confirmPassword:yup.string().oneOf([yup.ref('password')],'Пароли не совпадают').required('Обязательно')
   })
-  const [password,setPassword]=useState('password')
-  const[show,setShow]=useState(eyeoff)
-    const handleEyeClic=()=>{
-     if(password==='password'){
-       setShow(eye)
-       setPassword('text')
-     }
-     else{
-       setShow(eyeoff)
-       setPassword('password')
-   }
-   }
+  
+  const [passwordState, setPasswordState] = useState({
+    length: false,
+    lowercase: false,
+    uppercase: false,
+    digit: false,
+    specialChar: false,
+  });
+   
   return (
     
     <div className='register'>
@@ -90,18 +93,48 @@ function Registration() {
 
             <label htmlFor={`password`} className='register__form-pass-lable'>
             <input
-              type="password"
-              placeholder='Создай пароль'
-              name={`password`}
-              className='register__form-input'
-              onChange={handleChange}
-              onBlur={handelBlur}
-              value={values.password}
-            />
-              <img src={show} 
-                alt="show" 
-                className='register__form-img' 
-                onClick={handleEyeClic} />
+            type="password"
+            placeholder='Создай пароль'
+            name="password"
+            className={`register__form-input ${
+              touched.password && errors.password ? 'error' : '' 
+            }`}
+            onChange={(e) => {
+              handleChange(e);
+              const password = e.target.value;
+              setPasswordState({
+                length: password.length >= 8 && password.length <= 15,
+                lowercase: /[a-z]/.test(password),
+                uppercase: /[A-Z]/.test(password),
+                digit: /\d/.test(password),
+                specialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+              });
+            }}
+            onBlur={handelBlur}
+            value={values.password}
+          />
+          <ErrorMessage name="password" component="div" />
+
+        
+          <div>
+           {!values.password ?<li className='register__form-li'>От 8 до 15 символов</li>  
+           : passwordState.length ? '✅ Длина от 8 до 15 символов' : '❌ Длина от 8 до 15 символов'}
+         </div>
+
+         <div>
+           {!values.password ? <li className='register__form-li'>Строчные и прописные буквы</li> 
+          : passwordState.lowercase ? '✅ Содержит строчные буквы' : '❌ Содержит строчные буквы'}
+         </div>
+
+         <div>
+          {!values.password ? <li className='register__form-li'>Минимум 1 цифр</li> 
+          : passwordState.uppercase ? '✅ Содержит прописные буквы' : '❌ Содержит прописные буквы'}
+        </div>
+    
+        <div>
+        {!values.password ?  <li className='register__form-li'>Минимум 1 спецсимвол (!, ", #, $...)</li> 
+        : passwordState.digit ? '✅ Содержит минимум 1 цифру' : '❌ Содержит минимум 1 цифру'}
+        </div>
           {touched.password && errors.password && <p className='register__from-eror'>{errors.password}</p>}
 
             </label>
@@ -116,22 +149,26 @@ function Registration() {
               onBlur={handelBlur}
               value={values.confirmPassword}
             />
-             <img src={show} 
-                alt="show" 
-                className='register__form-img' 
-                onClick={handleEyeClic} />
+             
           {touched.confirmPassword && errors.confirmPassword && <p className='register__from-eror'>{errors.confirmPassword}</p>}
 
             </label>
-
+           
             <button
-              disabled={!isValid && !dirty}
               onClick={handleSubmit}
               type={`submit`}
               className='register__btn'
+              disabled={!isValid && !dirty}
+              style={{
+                background: (!isValid || !dirty || Object.keys(touched).length !== Object.keys(validationsSchema.fields).length) ? '#D7D7D7' : 'black',
+                color: (!isValid || !dirty || Object.keys(touched).length !== Object.keys(validationsSchema.fields).length) ? '#767676' : 'white',
+              }}
             >
+              <Link to={'/letter'} className='register__link'>
             Далее
+            </Link>
             </button>
+           
           </div>
         )}
     </Formik>
