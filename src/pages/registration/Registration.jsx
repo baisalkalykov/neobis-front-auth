@@ -1,6 +1,6 @@
 import React from 'react'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom';
 import boy from '../../assets-images/Photo background.png'
 import eye from '../../assets-images/eye.svg'
 import eyeoff from '../../assets-images/eye-close.svg'
@@ -8,11 +8,11 @@ import arow from '../../assets-images/arow.svg'
 import './Registration.scss'
 import { Formik, ErrorMessage } from 'formik'
 import * as yup from 'yup' 
-
+import axios from 'axios';
 
 
 function Registration() {
-
+  const navigate = useNavigate();
   const validationsSchema= yup.object().shape({
     email:yup.string().email('должно быть строкой').required('Обязательно'),
     login:yup.string().typeError('должно быть строкой').required('Обязательно'),
@@ -33,7 +33,27 @@ function Registration() {
     digit: false,
     specialChar: false,
   });
-   
+  const handleSubmit = async (values) => {
+    try {
+      // Отправка данных на сервер
+      const response = await axios.post('https://neobis-auth-project.up.railway.app/api/users/signUp', values);
+      
+      // После успешной регистрации получаем токены из ответа
+      const { accessToken, refreshToken } = response.data;
+
+      // Сохраняем токены в локальном хранилище
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+
+      // Перенаправление на страницу /letter
+      navigate('/letter')
+    } catch (error) {
+      console.error('Ошибка при отправке запроса:', error);
+      // Обработка ошибок
+    }
+  };
+
+
   return (
     
     <div className='register'>
@@ -47,17 +67,15 @@ function Registration() {
         <div className="register__img">
           <img src={boy} alt="" />
         </div>
-      <Formik
+        <Formik
         initialValues={{
-        email: '',
-        login: '',
-        password: '',
-        confirmPassword: ''
-      }}
-        validateOnBlur
-        onSubmit={(values) => {
-        console.log(values);
+          email: '',
+          login: '',
+          password: '',
+          confirmPassword: '',
         }}
+        validateOnBlur
+        onSubmit={handleSubmit}
         validationSchema={validationsSchema}
       >
       {({ values, errors, touched, handleChange, handelBlur, isValid, handleSubmit, dirty }) => (
@@ -164,9 +182,8 @@ function Registration() {
                 color: (!isValid || !dirty || Object.keys(touched).length !== Object.keys(validationsSchema.fields).length) ? '#767676' : 'white',
               }}
             >
-              <Link to={'/letter'} className='register__link'>
+            
             Далее
-            </Link>
             </button>
            
           </div>
