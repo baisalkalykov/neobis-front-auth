@@ -3,17 +3,23 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import boy from '../../assets-images/Photo background.png';
 import './Login.scss'
-
+import { useSearchParams } from 'react-router-dom';
+import { BsEye } from "react-icons/bs";
+import { BsEyeSlash } from "react-icons/bs";
 
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [show,setShow] = useState(false)
+  const [error, setError] = useState(null);
 
+  
   const handleLogin = async () => {
     try {
       // Отправка данных на сервер для входа
-      const response = await axios.post('https://neobis-auth-project.up.railway.app/api/users/login', {
+      const response = await axios.post('https://neobis-auth-project.up.railway.app/api/users/signIn', {
         email,
         password,
       });
@@ -23,20 +29,36 @@ const Login = () => {
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
 
-      // Перенаправляем пользователя на нужную страницу
-      navigate('/welcom');
+      // Добавляем токены к параметрам поиска
+      setSearchParams({ access_token: accessToken, refresh_token: refreshToken });
+
+      if (response.status === 200) {
+        navigate('/welcom');
+      }
     } catch (error) {
       console.error('Ошибка при входе:', error);
       // Обработка ошибок
-    }
+    }setError('Неверный логин или пароль')
+    setTimeout(() => {
+      setError(null);
+    }, 5000);
   };
+  const handleEye = () => {
+    setShow(!show);
+  };
+  const handleSubmit= (event)=>{
+   event.preventDefault()
+  }
 
   return (
     <div className='login'>
       <div className="login__img">
         <img src={boy} alt="boy-img" className='login__img-boy' />
       </div>
-      <form className='login__form'>
+      <form className='login__form' onSubmit={handleSubmit}>
+      {error && <div className="login__form-error">
+        <p className='login__form-error-text'>{error}</p>
+        </div>}
         <p className='login__form-p'>Вэлком бэк!</p>
         <label className='login__form-label'>
           <input 
@@ -50,12 +72,15 @@ const Login = () => {
 
         <label className='login__form-password'>
           <input 
-            type="password"
+            type={show ? 'text' : 'password'}
             placeholder='Введите пароль'
             className='login__form-input'
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+         <button onClick={handleEye} className='login__form-eye'>
+           {show ? <BsEye className='login__form-eye'/> : <BsEyeSlash className='login__form-eye' />}
+             </button>
         </label>
         <button 
           className='login__form-btn' 

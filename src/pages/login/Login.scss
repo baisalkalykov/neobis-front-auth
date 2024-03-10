@@ -4,6 +4,7 @@
     align-items: center;
     justify-content: center;
     gap: 100px;
+    position: relative;
 
 &__img-boy{
     width: 720px;
@@ -38,10 +39,14 @@
    position: relative;
   }
   &__form-eye{
+    width: 21px !important;
+    height: 24px !important;
     position: absolute;
     top: 20%;
     right: 5%;
     cursor: pointer;
+    border: none;
+    background: transparent;
   }
   &__form-btn{
     width: 343px;
@@ -63,5 +68,17 @@
   }
   &__form-link{
     text-decoration: none;
+  }
+  &__form-error{
+    width: 343px;
+    height: 50px;
+    border-radius:12px ;
+    border: 1px solid red;
+    position: absolute;
+    top: 10%;
+  }
+  &__form-error-text{
+    color: red;
+    margin: 15px;
   }
 }

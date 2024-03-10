@@ -2,14 +2,13 @@ import React from 'react'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 import boy from '../../assets-images/Photo background.png'
-import eye from '../../assets-images/eye.svg'
-import eyeoff from '../../assets-images/eye-close.svg'
 import arow from '../../assets-images/arow.svg'
 import './Registration.scss'
 import { Formik, ErrorMessage } from 'formik'
 import * as yup from 'yup' 
 import axios from 'axios';
-
+import { BsEye } from "react-icons/bs";
+import { BsEyeSlash } from "react-icons/bs";
 
 function Registration() {
   const navigate = useNavigate();
@@ -33,27 +32,40 @@ function Registration() {
     digit: false,
     specialChar: false,
   });
+  
   const handleSubmit = async (values) => {
+    console.log(values)
+    const newValues={
+      email :values.email,
+      password:values.password,
+      verifyPassword: values.confirmPassword
+    }
     try {
       // Отправка данных на сервер
-      const response = await axios.post('https://neobis-auth-project.up.railway.app/api/users/signUp', values);
-      
+      const response = await axios.post('https://neobis-auth-project.up.railway.app/api/users/signUp', newValues);
+      console.log(response)
       // После успешной регистрации получаем токены из ответа
       const { accessToken, refreshToken } = response.data;
-
+  
       // Сохраняем токены в локальном хранилище
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
-
-      // Перенаправление на страницу /letter
-      navigate('/letter')
+  
+      if (response.status === 200) {
+        navigate('/letter');
+      }
     } catch (error) {
       console.error('Ошибка при отправке запроса:', error);
       // Обработка ошибок
     }
+    
   };
-
-
+  const [show,setShow] = useState(false)
+  const [showTwo,setShowTwo]=useState(false)
+  const handleEye = () => {
+    setShow(!show);
+    setShowTwo(!showTwo)
+  };
   return (
     
     <div className='register'>
@@ -111,7 +123,7 @@ function Registration() {
 
             <label htmlFor={`password`} className='register__form-pass-lable'>
             <input
-            type="password"
+             type={show ? 'text' : 'password'}
             placeholder='Создай пароль'
             name="password"
             className={`register__form-input ${
@@ -131,6 +143,9 @@ function Registration() {
             onBlur={handelBlur}
             value={values.password}
           />
+           <button onClick={handleEye} className='register__form-eye'>
+           {show ? <BsEye className='register__form-eye'/> : <BsEyeSlash className='register__form-eye' />}
+            </button>
           <ErrorMessage name="password" component="div" />
 
         
@@ -159,7 +174,7 @@ function Registration() {
 
             <label htmlFor={`confirmPassword`} className='register__form-pass-lable'>
             <input
-              type="password"
+              type={show ? 'text' : 'password'}
               placeholder='Повтори пароль'
               name={`confirmPassword`}
               className='register__form-input'
@@ -167,7 +182,9 @@ function Registration() {
               onBlur={handelBlur}
               value={values.confirmPassword}
             />
-             
+              <button onClick={handleEye} className='register__form-eye'>
+           {showTwo ? <BsEye className='register__form-eye'/> : <BsEyeSlash className='register__form-eye' />}
+             </button>
           {touched.confirmPassword && errors.confirmPassword && <p className='register__from-eror'>{errors.confirmPassword}</p>}
 
             </label>
